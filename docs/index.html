@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dogear — security & OSINT link library</title>
+<meta name="description" content="A searchable, curated library of security, pentesting, and OSINT tools.">
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --panel2: #1c2430; --border: #2a3441;
+    --text: #e6edf3; --muted: #8b949e; --accent: #2f81f7; --accent2: #3fb950;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  a { color: inherit; text-decoration: none; }
+  header {
+    position: sticky; top: 0; z-index: 10; background: rgba(13,17,23,.92);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--border);
+    padding: 18px 20px 14px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 { margin: 0 0 2px; font-size: 22px; letter-spacing: -.3px; }
+  h1 .dot { color: var(--accent); }
+  .tag { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  #search {
+    flex: 1 1 280px; min-width: 0; padding: 10px 14px; font-size: 15px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 9px;
+    color: var(--text); outline: none;
+  }
+  #search:focus { border-color: var(--accent); }
+  .tabs { display: flex; gap: 6px; }
+  .tab {
+    padding: 9px 14px; border: 1px solid var(--border); border-radius: 9px;
+    background: var(--panel); color: var(--muted); cursor: pointer; font-size: 14px;
+    white-space: nowrap;
+  }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .stats { color: var(--muted); font-size: 12.5px; margin-top: 10px; }
+  main { max-width: 1100px; margin: 0 auto; padding: 22px 20px 60px; }
+  .cat { margin-bottom: 30px; }
+  .cat h2 {
+    font-size: 14px; text-transform: uppercase; letter-spacing: .6px;
+    color: var(--muted); margin: 0 0 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .cat h2 .n { color: var(--accent2); font-weight: 600; }
+  .grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .card {
+    display: block; padding: 12px 14px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 10px; transition: .12s;
+  }
+  .card:hover { border-color: var(--accent); background: var(--panel2); transform: translateY(-1px); }
+  .card .t { font-weight: 600; font-size: 14.5px; }
+  .card .u { color: var(--muted); font-size: 12px; margin-top: 3px; overflow: hidden;
+             text-overflow: ellipsis; white-space: nowrap; }
+  .hidden { display: none !important; }
+  .empty { color: var(--muted); padding: 40px 0; text-align: center; }
+  mark { background: rgba(47,129,247,.35); color: inherit; border-radius: 3px; }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; color: var(--muted); font-size: 12.5px; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Dog<span class="dot">●</span>ear</h1>
+  <p class="tag">A curated, searchable library of security, pentesting &amp; OSINT tools.</p>
+  <div class="controls">
+    <input id="search" type="search" placeholder="Search tools, e.g. burp, dns, hashcat…" autocomplete="off">
+    <div class="tabs" id="tabs"></div>
+  </div>
+  <div class="stats" id="stats"></div>
+</div></header>
+<main id="content"></main>
+<footer>
+  Generated from the bookmark files in this repo — re-importable HTML lives in
+  <code>security/</code> and <code>osint/</code>. Links are checked automatically every week.
+</footer>
+<script>
+const DATA = [{"name": "Security", "count": 71, "categories": [{"name": "Reconnaissance & OSINT", "links": [{"title": "Censys Search", "url": "https://search.censys.io/"}, {"title": "Maltego", "url": "https://www.maltego.com/"}, {"title": "Masscan", "url": "https://github.com/robertdavidgraham/masscan"}, {"title": "Nmap", "url": "https://nmap.org/"}, {"title": "OSINT Framework", "url": "https://osintframework.com/"}, {"title": "OWASP Amass", "url": "https://github.com/owasp-amass/amass"}, {"title": "Recon-ng", "url": "https://github.com/lanmaster53/recon-ng"}, {"title": "Shodan", "url": "https://www.shodan.io/"}, {"title": "SpiderFoot", "url": "https://www.spiderfoot.net/"}, {"title": "theHarvester", "url": "https://github.com/laramies/theHarvester"}]}, {"name": "Web Application Testing", "links": [{"title": "Burp Suite (PortSwigger)", "url": "https://portswigger.net/burp"}, {"title": "ffuf", "url": "https://github.com/ffuf/ffuf"}, {"title": "Gobuster", "url": "https://github.com/OJ/gobuster"}, {"title": "Nikto", "url": "https://github.com/sullo/nikto"}, {"title": "Nuclei", "url": "https://github.com/projectdiscovery/nuclei"}, {"title": "OWASP ZAP", "url": "https://www.zaproxy.org/"}, {"title": "sqlmap", "url": "https://sqlmap.org/"}, {"title": "WPScan", "url": "https://wpscan.com/"}]}, {"name": "Exploitation Frameworks", "links": [{"title": "Exploit Database", "url": "https://www.exploit-db.com/"}, {"title": "Impacket", "url": "https://github.com/fortra/impacket"}, {"title": "Metasploit", "url": "https://www.metasploit.com/"}, {"title": "Sliver C2", "url": "https://github.com/BishopFox/sliver"}]}, {"name": "Passwords & Credentials", "links": [{"title": "CrackStation", "url": "https://crackstation.net/"}, {"title": "Hashcat", "url": "https://hashcat.net/hashcat/"}, {"title": "Have I Been Pwned", "url": "https://haveibeenpwned.com/"}, {"title": "John the Ripper", "url": "https://www.openwall.com/john/"}, {"title": "THC Hydra", "url": "https://github.com/vanhauser-thc/thc-hydra"}]}, {"name": "Active Directory & Post-Exploitation", "links": [{"title": "BloodHound", "url": "https://github.com/SpecterOps/BloodHound"}, {"title": "Certipy", "url": "https://github.com/ly4k/Certipy"}, {"title": "Mimikatz", "url": "https://github.com/gentilkiwi/mimikatz"}, {"title": "NetExec", "url": "https://github.com/Pennyw0rth/NetExec"}, {"title": "Responder", "url": "https://github.com/lgandx/Responder"}]}, {"name": "Network & Wireless", "links": [{"title": "Aircrack-ng", "url": "https://www.aircrack-ng.org/"}, {"title": "tcpdump", "url": "https://www.tcpdump.org/"}, {"title": "Wireshark", "url": "https://www.wireshark.org/"}]}, {"name": "Vulnerability Intelligence", "links": [{"title": "CISA Known Exploited Vulnerabilities", "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"}, {"title": "CVE Program", "url": "https://www.cve.org/"}, {"title": "MITRE ATT&CK", "url": "https://attack.mitre.org/"}, {"title": "NVD (NIST)", "url": "https://nvd.nist.gov/"}, {"title": "OWASP Top Ten", "url": "https://owasp.org/www-project-top-ten/"}]}, {"name": "Forensics & Reverse Engineering", "links": [{"title": "Autopsy", "url": "https://www.autopsy.com/"}, {"title": "CyberChef", "url": "https://gchq.github.io/CyberChef/"}, {"title": "Ghidra", "url": "https://ghidra-sre.org/"}, {"title": "radare2", "url": "https://rada.re/n/"}, {"title": "Volatility Foundation", "url": "https://www.volatilityfoundation.org/"}]}, {"name": "Threat Intelligence", "links": [{"title": "AbuseIPDB", "url": "https://www.abuseipdb.com/"}, {"title": "AlienVault OTX", "url": "https://otx.alienvault.com/"}, {"title": "GreyNoise", "url": "https://www.greynoise.io/"}, {"title": "MISP", "url": "https://www.misp-project.org/"}, {"title": "OpenCTI", "url": "https://www.opencti.io/"}, {"title": "urlscan.io", "url": "https://urlscan.io/"}, {"title": "VirusTotal", "url": "https://www.virustotal.com/"}]}, {"name": "Learning & Practice", "links": [{"title": "CyberDefenders", "url": "https://cyberdefenders.org/"}, {"title": "Hack The Box", "url": "https://www.hackthebox.com/"}, {"title": "OverTheWire", "url": "https://overthewire.org/wargames/"}, {"title": "picoCTF", "url": "https://picoctf.org/"}, {"title": "PortSwigger Web Security Academy", "url": "https://portswigger.net/web-security"}, {"title": "Root-Me", "url": "https://www.root-me.org/"}, {"title": "TryHackMe", "url": "https://tryhackme.com/"}, {"title": "VulnHub", "url": "https://www.vulnhub.com/"}]}, {"name": "Reference & Cheat Sheets", "links": [{"title": "GTFOBins", "url": "https://gtfobins.github.io/"}, {"title": "HackTricks", "url": "https://github.com/HackTricks-wiki/hacktricks"}, {"title": "LOLBAS", "url": "https://lolbas-project.github.io/"}, {"title": "OWASP", "url": "https://owasp.org/"}, {"title": "PayloadsAllTheThings", "url": "https://github.com/swisskyrepo/PayloadsAllTheThings"}, {"title": "SecLists", "url": "https://github.com/danielmiessler/SecLists"}]}, {"name": "Distributions", "links": [{"title": "Kali Linux", "url": "https://www.kali.org/"}, {"title": "Parrot Security OS", "url": "https://www.parrotsec.org/"}]}, {"name": "Awesome Lists", "links": [{"title": "Awesome Hacking", "url": "https://github.com/Hack-with-Github/Awesome-Hacking"}, {"title": "awesome-osint", "url": "https://github.com/jivoi/awesome-osint"}, {"title": "awesome-pentest", "url": "https://github.com/enaqx/awesome-pentest"}]}]}, {"name": "OSINT", "count": 200, "categories": [{"name": "Company", "links": [{"title": "Accuranker", "url": "https://www.accuranker.com/"}, {"title": "Canadian Business Research", "url": "https://www.canada.ca/en/services/business/research.html"}, {"title": "Crunchbase", "url": "https://www.crunchbase.com/"}, {"title": "Europages", "url": "http://www.europages.co.uk/"}, {"title": "Ezilion", "url": "http://www.ezilon.com/"}, {"title": "Glassdoor", "url": "https://www.glassdoor.com/"}, {"title": "Guidestar", "url": "http://www.guidestar.org/"}, {"title": "LinkedIn", "url": "https://www.linkedin.com/"}, {"title": "Marketvisual", "url": "http://www.marketvisual.com/"}, {"title": "Morningstar Research", "url": "http://library.morningstar.com/"}, {"title": "OpenCorporates", "url": "https://opencorporates.com/"}, {"title": "Orbis Directory", "url": "http://orbisdirectory.bvdinfo.com/version-20161014/OrbisDirectory/Companies"}, {"title": "Overseas Company Records", "url": "https://www.gov.uk/government/publications/overseas-registries/overseas-registries"}, {"title": "Owler", "url": "https://www.owler.com/"}, {"title": "Scoot", "url": "http://www.scoot.co.uk/"}, {"title": "Serpstat", "url": "https://serpstat.com/"}, {"title": "Spyfu", "url": "http://www.spyfu.com/"}, {"title": "Wikipedia National Company Registers", "url": "https://en.wikipedia.org/wiki/List_of_company_registers"}]}, {"name": "Internet Scan", "links": [{"title": "Ahrefs", "url": "https://ahrefs.com/"}, {"title": "Alexa", "url": "http://www.alexa.com/"}, {"title": "Builtwith", "url": "http://builtwith.com/"}, {"title": "DNS Dumpster", "url": "https://dnsdumpster.com/"}, {"title": "DNS Trails", "url": "https://securitytrails.com/dns-trails"}, {"title": "ExoneraTor Tor Relay Search", "url": "https://exonerator.torproject.org/"}, {"title": "Follow.net", "url": "http://follow.net/"}, {"title": "Greynoise", "url": "http://greynoise.io/"}, {"title": "Home", "url": "https://www.youtube.com/"}, {"title": "https://www.youtube.com/", "url": "https://www.youtube.com/"}, {"title": "IntelliTamper", "url": "http://www.softpedia.com/get/Internet/Other-Internet-Related/IntelliTamper.shtml"}, {"title": "Intelx.io", "url": "https://intelx.io/"}, {"title": "IP Fingerprints", "url": "http://www.ipfingerprints.com/"}, {"title": "Moz Research Tools OSE", "url": "https://moz.com/researchtools/ose"}, {"title": "MX Toolbox", "url": "https://mxtoolbox.com/"}, {"title": "Netcraft Site Report", "url": "https://sitereport.netcraft.com/"}, {"title": "Robtex", "url": "https://www.robtex.com/"}, {"title": "Shodan", "url": "https://shodan.io/"}, {"title": "Spyse", "url": "https://spyse.com/"}, {"title": "TCPIP Utils", "url": "http://www.tcpiputils.com/"}, {"title": "View DNS", "url": "http://viewdns.info/"}, {"title": "WaybackMachine", "url": "http://archive.org/"}, {"title": "Website Informer", "url": "http://website.informer.com/"}, {"title": "Who Is Hosting This", "url": "http://www.whoishostingthis.com/"}, {"title": "Whoisology", "url": "https://whoisology.com/"}]}, {"name": "Email Search", "links": [{"title": "Dehashed", "url": "https://dehashed.com/"}, {"title": "Email Validator", "url": "https://chema.ga/emailvalidator/index.php"}, {"title": "EmailHippo", "url": "https://tools.verifyemailaddress.io/"}, {"title": "Have I Been Pwned", "url": "https://haveibeenpwned.com/"}, {"title": "Hunter.io", "url": "https://hunter.io/"}, {"title": "Pipl", "url": "https://pipl.com/"}, {"title": "Thats Them", "url": "https://thatsthem.com/reverse-email-lookup"}, {"title": "Toofr", "url": "https://www.toofr.com/"}, {"title": "Verify Email", "url": "http://verify-email.org/"}, {"title": "Voilanorbert", "url": "https://www.voilanorbert.com/"}]}, {"name": "Phone Number", "links": [{"title": "Free Carrier Lookup", "url": "http://freecarrierlookup.com/"}, {"title": "National Cellular Directory", "url": "https://www.nationalcellulardirectory.com/"}, {"title": "OpenCNAM", "url": "http://opencnam.com/"}, {"title": "Phone Validator", "url": "https://www.phonevalidator.com/index.aspx"}, {"title": "Reverse Phone Lookup", "url": "http://www.reversephonelookup.com/"}, {"title": "Spy Dialer", "url": "http://spydialer.com/"}, {"title": "Twillo", "url": "https://www.twilio.com/lookup"}]}, {"name": "People", "links": [{"title": "192 (UK)", "url": "http://www.192.com/"}, {"title": "411 (US)", "url": "http://www.411.com/"}, {"title": "Alumni.net", "url": "http://www.alumni.net/"}, {"title": "Ancestry", "url": "http://www.ancestry.com/"}, {"title": "Canada411 (Canada)", "url": "http://www.canada411.ca/"}, {"title": "Classmates", "url": "http://www.classmates.com/"}, {"title": "Facesearch", "url": "http://facesaerch.com/"}, {"title": "Family Search", "url": "https://familysearch.org/"}, {"title": "Family Tree Now", "url": "http://www.familytreenow.com/"}, {"title": "Faxvin", "url": "http://faxvin.com/"}, {"title": "Fold3 (US Military Records) - Browse records of US Military members", "url": "http://www.fold3.com/"}, {"title": "Genealogy Links", "url": "http://www.genealogylinks.net/"}, {"title": "Homemetry", "url": "https://homemetry.com/"}, {"title": "Infobel", "url": "http://www.infobel.com/en/world"}, {"title": "Inmate Location", "url": "http://www.bop.gov/inmateloc"}, {"title": "Interment", "url": "http://www.interment.net/data/search.htm"}, {"title": "International White and Yellow Pages", "url": "http://www.wayp.com/"}, {"title": "Itools", "url": "http://itools.com/search/people-search"}, {"title": "LittleSis", "url": "https://littlesis.org/"}, {"title": "LookUpUK (UK)", "url": "http://www.lookupuk.com/"}, {"title": "Lullar", "url": "http://com.lullar.com/"}, {"title": "PeekYou", "url": "http://www.peekyou.com/"}, {"title": "People Search (Australia)", "url": "http://www.peoplesearch.com.au/"}, {"title": "Pipl", "url": "https://pipl.com/"}, {"title": "Recruitin", "url": "http://recruitin.net/"}, {"title": "Rocket Reach", "url": "http://rocketreach.co/"}, {"title": "Search Bug", "url": "http://www.searchbug.com/"}, {"title": "Skip Ease", "url": "http://www.skipease.com/"}, {"title": "SnoopStation", "url": "http://snoopstation.com/"}, {"title": "Spokeo", "url": "http://www.spokeo.com/"}, {"title": "Switchboard", "url": "http://www.switchboard.com/"}, {"title": "ThatsThem", "url": "https://thatsthem.com/img/favicon-32x32.png"}, {"title": "The National Archives (United Kingdom)", "url": "http://www.nationalarchives.gov.uk/"}, {"title": "USSearch", "url": "http://www.ussearch.com/"}, {"title": "White Pages (US)", "url": "http://www.whitepages.com/"}, {"title": "Wink", "url": "https://webmii.com/v3/img/apple-touch-icon.png"}, {"title": "Wink", "url": "http://itools.com/tool/wink-people-search"}, {"title": "Yasni", "url": "http://www.yasni.com/"}, {"title": "Zabasearch", "url": "http://www.zabasearch.com/"}, {"title": "Zoominfo", "url": "http://www.zoominfo.com/"}]}, {"name": "Maps & Geography", "links": [{"title": "Bing Maps", "url": "http://www.bing.com/maps"}, {"title": "Dominoc925", "url": "https://dominoc925-pages.appspot.com/mapplets/cs_mgrs.html"}, {"title": "Google Earth", "url": "http://www.google.com/earth"}, {"title": "Google Maps", "url": "https://www.google.com/maps"}, {"title": "Google My Maps", "url": "https://www.google.com/maps/about/mymaps"}, {"title": "Wireless Network Mapping", "url": "https://wigle.net/"}]}, {"name": "Search", "links": [{"title": "Advangle", "url": "http://advangle.com/"}, {"title": "Alleba (Philippines)", "url": "http://www.alleba.com/"}, {"title": "Aol", "url": "http://search.aol.com/"}, {"title": "Archive.org Open Source Videos", "url": "https://archive.org/details/opensource_movies"}, {"title": "Ask", "url": "http://www.ask.com/"}, {"title": "Baidu (China)", "url": "http://www.baidu.com/"}, {"title": "Baidu Images", "url": "http://image.baidu.com/"}, {"title": "Bing", "url": "http://www.bing.com/"}, {"title": "Bing Images", "url": "http://www.bing.com/images"}, {"title": "Bing Video", "url": "http://www.bing.com/?scope=video"}, {"title": "DailyMotion", "url": "http://www.dailymotion.com/"}, {"title": "Draugiem", "url": "https://www.draugiem.lv/"}, {"title": "DuckDuckGo", "url": "https://duckduckgo.com/"}, {"title": "Earthcam", "url": "http://www.earthcam.com/"}, {"title": "Eniro (Sweden)", "url": "http://www.eniro.se/"}, {"title": "Flickr", "url": "https://secure.flickr.com/"}, {"title": "FotoForensics", "url": "http://www.fotoforensics.com/"}, {"title": "Goo (Japan)", "url": "http://www.goo.ne.jp/"}, {"title": "Google", "url": "http://www.google.com/"}, {"title": "Google Image", "url": "https://images.google.com/"}, {"title": "Image Identify", "url": "https://www.imageidentify.com/"}, {"title": "Impersonal.me", "url": "http://www.impersonal.me/"}, {"title": "Instya", "url": "http://www.instya.com/"}, {"title": "iSeek", "url": "http://education.iseek.com/iseek/home.page"}, {"title": "IxQuick", "url": "https://www.ixquick.com/"}, {"title": "Jeffreys Image Metadata Viewer", "url": "http://exif.regex.info/"}, {"title": "KarmaDecay", "url": "http://karmadecay.com/"}, {"title": "LiveLeak", "url": "http://www.liveleak.com/"}, {"title": "Lycos", "url": "http://www.lycos.com/"}, {"title": "Lycos Image Search", "url": "http://search.lycos.com/"}, {"title": "Metapicz", "url": "http://metapicz.com/"}, {"title": "Najdsi (Slovenia)", "url": "http://www.najdi.si/"}, {"title": "Naver (South Korea)", "url": "http://www.naver.com/"}, {"title": "Offshore Leak Database", "url": "https://offshoreleaks.icij.org/"}, {"title": "Onet.pl (Poland)", "url": "http://www.onet.pl/"}, {"title": "Parseek (Iran)", "url": "http://www.parseek.com/"}, {"title": "PhotoBucket", "url": "http://photobucket.com/"}, {"title": "Picsearch", "url": "http://www.picsearch.com/"}, {"title": "Pimeyes", "url": "https://pimeyes.com/"}, {"title": "SAPO (Portugal)", "url": "http://www.sapo.pt/"}, {"title": "Search Code", "url": "https://searchcode.com/"}, {"title": "Search.ch (Switzerland)", "url": "http://www.search.ch/"}, {"title": "Search.com", "url": "http://www.search.com/"}, {"title": "SurfCanyon", "url": "http://www.surfcanyon.com/"}, {"title": "Tineye", "url": "https://tineye.com/"}, {"title": "Vimeo", "url": "https://vimeo.com/"}, {"title": "Walla (Israel)", "url": "http://www.walla.co.il/"}, {"title": "Wolfram Alpha", "url": "http://www.wolframalpha.com/"}, {"title": "Yahoo", "url": "http://www.yahoo.com/"}, {"title": "Yahoo Image Search", "url": "https://images.search.yahoo.com/"}, {"title": "Yahoo Video Search", "url": "http://video.search.yahoo.com/"}, {"title": "Yandex (Russia)", "url": "http://www.yandex.com/"}, {"title": "Yandex Images", "url": "https://www.yandex.com/images"}, {"title": "YouTube", "url": "https://www.youtube.com/"}, {"title": "YouTube Data Viewer", "url": "https://www.amnestyusa.org/citizenevidence"}]}, {"name": "Social Media Tools", "links": [{"title": "Backtweets", "url": "http://backtweets.com/"}, {"title": "Facebook Search", "url": "http://search.fb.com/"}, {"title": "Find my Facebook ID", "url": "https://findmyfbid.in/"}, {"title": "Glass Door", "url": "https://www.glassdoor.co.in/Reviews/index.htm"}, {"title": "Hashtagify", "url": "http://hashtagify.me/"}, {"title": "https://tinfoleak.com", "url": "https://tinfoleak.com/favicon/xandroid-icon-192x192.png.pagespeed.ic.SrzO0FouKa.jpg"}, {"title": "Lookup-ID.com", "url": "https://lookup-id.com/"}, {"title": "Picodash", "url": "https://www.picodash.com/"}, {"title": "Social Blade", "url": "https://socialblade.com/"}, {"title": "Social Rank", "url": "https://www.socialrank.com/"}, {"title": "Social Searcher", "url": "https://www.social-searcher.com/"}, {"title": "Twitter Search", "url": "http://search.twitter.com/"}, {"title": "Vk", "url": "http://vk.com/app3046467"}]}, {"name": "Social Networks", "links": [{"title": "Facebook", "url": "http://www.facebook.com/"}, {"title": "Facenama", "url": "http://facenama.com/"}, {"title": "Instagram", "url": "https://www.instagram.com/"}, {"title": "LinkedIn", "url": "https://www.linkedin.com/"}, {"title": "Mixi", "url": "https://mixi.jp/"}, {"title": "Odnoklassniki (Russia)", "url": "http://ok.ru/"}, {"title": "Pinterest", "url": "http://www.pinterest.com/"}, {"title": "QQ", "url": "http://qzone.qq.com/"}, {"title": "Reddit", "url": "https://www.reddit.com/"}, {"title": "Taringa", "url": "http://www.taringa.net/"}, {"title": "Tinder", "url": "https://www.gotinder.com/"}, {"title": "Tumblr", "url": "https://www.tumblr.com/"}, {"title": "Twitter", "url": "https://twitter.com/"}, {"title": "Weibo China", "url": "http://weibo.com/"}]}, {"name": "User Name Check", "links": [{"title": "Check User Names", "url": "http://www.checkusernames.com/"}, {"title": "Knowem", "url": "http://www.knowem.com/"}, {"title": "Name Checkr", "url": "http://www.namecheckr.com/"}, {"title": "Name Chk", "url": "http://www.namechk.com/"}, {"title": "Namecheckup", "url": "https://namecheckup.com/"}, {"title": "User Search", "url": "http://www.usersearch.org/"}, {"title": "WhatsMyName", "url": "https://whatsmyname.app/"}]}, {"name": "Collections", "links": [{"title": "Awesome OSINT", "url": "https://github.com/jivoi/awesome-osint"}, {"title": "OhShint!", "url": "https://github.com/OhShINT"}]}, {"name": "Broad Search Tools", "links": [{"title": "Epieos", "url": "https://epieos.com/"}, {"title": "Intel Techniques Tools", "url": "https://inteltechniques.com/tools/"}, {"title": "OSINT.industries", "url": "https://osint.industries/"}]}]}];
+const $ = s => document.querySelector(s);
+let activeTab = "All";
+
+function esc(s){ return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function hostOf(u){ try { return new URL(u).hostname.replace(/^www\./,''); } catch { return u; } }
+function highlight(s, q){
+  if(!q) return esc(s);
+  const i = s.toLowerCase().indexOf(q);
+  if(i < 0) return esc(s);
+  return esc(s.slice(0,i)) + '<mark>' + esc(s.slice(i,i+q.length)) + '</mark>' + esc(s.slice(i+q.length));
+}
+
+function buildTabs(){
+  const tabs = ["All", ...DATA.map(c => c.name)];
+  $("#tabs").innerHTML = tabs.map(t =>
+    `<button class="tab${t===activeTab?' active':''}" data-tab="${esc(t)}">${esc(t)}</button>`).join("");
+  $("#tabs").querySelectorAll(".tab").forEach(b =>
+    b.onclick = () => { activeTab = b.dataset.tab; buildTabs(); render(); });
+}
+
+function render(){
+  const q = $("#search").value.trim().toLowerCase();
+  const cols = DATA.filter(c => activeTab === "All" || c.name === activeTab);
+  let shown = 0, html = "";
+  for(const col of cols){
+    for(const cat of col.categories){
+      const matches = cat.links.filter(l =>
+        !q || l.title.toLowerCase().includes(q) || l.url.toLowerCase().includes(q)
+           || cat.name.toLowerCase().includes(q));
+      if(!matches.length) continue;
+      shown += matches.length;
+      const label = activeTab === "All" ? col.name + " · " + cat.name : cat.name;
+      html += `<section class="cat"><h2>${esc(label)} <span class="n">${matches.length}</span></h2><div class="grid">`;
+      for(const l of matches){
+        html += `<a class="card" href="${esc(l.url)}" target="_blank" rel="noopener">
+          <div class="t">${highlight(l.title, q)}</div>
+          <div class="u">${highlight(hostOf(l.url), q)}</div></a>`;
+      }
+      html += `</div></section>`;
+    }
+  }
+  $("#content").innerHTML = html || `<div class="empty">No tools match “${esc(q)}”.</div>`;
+  const total = DATA.reduce((n,c)=>n+c.count,0);
+  $("#stats").textContent = q || activeTab !== "All"
+    ? `Showing ${shown} of ${total} tools`
+    : `${total} tools across ${DATA.length} collections — all links checked weekly`;
+}
+
+$("#search").addEventListener("input", render);
+buildTabs(); render();
+</script>
+</body>
+</html>

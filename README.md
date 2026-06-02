@@ -2,9 +2,18 @@
 
 **A pentester's link library — and a place to organize your own.**
 
+### 🔎 [**Browse the live, searchable site →**](https://blackvectra.github.io/osint-bookmark/)
+
 Dogear is a curated, browser-importable library of security and
 penetration-testing resources, kept healthy automatically, plus a tool that
 organizes your *own* bookmark exports the way you want them.
+
+The whole collection is also a **live website** you can search and filter in
+the browser — 271 tools, instant search, no install. It's a single
+self-contained page generated from this repo by
+[`scripts/build_site.py`](scripts/build_site.py) and published via GitHub
+Pages. (To enable: repo **Settings → Pages → Source: GitHub Actions** — one
+click; or open [`docs/index.html`](docs/index.html) locally.)
 
 | Folder | What's in it |
 | --- | --- |
