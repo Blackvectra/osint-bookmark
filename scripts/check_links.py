@@ -32,8 +32,9 @@ USER_AGENT = (
 HREF_RE = re.compile(r'HREF="([^"]+)"', re.IGNORECASE)
 # A bookmark entry line; only these are eligible for pruning.
 ENTRY_RE = re.compile(r"<DT><A\s", re.IGNORECASE)
-# Files whose embedded bookmark HTML should be kept in sync when pruning.
-DEFAULT_PRUNE_FILES = ("osint/osint.html", "osint/README.md")
+# Bookmark collections scanned by default. Each file's directory is expected
+# to hold a README.md mirror that is kept in sync when pruning.
+DEFAULT_FILES = ("osint/osint.html", "security/security.html")
 # Permanent DNS failures (name does not resolve). Substring match keeps this
 # portable across platforms; note "Temporary failure in name resolution"
 # (EAI_AGAIN) is intentionally excluded as it is transient.
@@ -110,12 +111,13 @@ def check_url(url: str, timeout: float) -> tuple[str, bool, str, bool]:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 return url, True, f"{resp.status}", False
         except urllib.error.HTTPError as exc:
-            # Some servers reject HEAD (405) but accept GET — retry with GET.
-            if method == "HEAD" and exc.code in (403, 405, 501):
-                continue
             # 401/403/429 means the host is alive but gated; treat as reachable.
             if exc.code in (401, 403, 429):
                 return url, True, f"{exc.code} (reachable, gated)", False
+            # Many sites reject HEAD (404/405/500/...) but serve GET — never
+            # judge a link dead on a HEAD failure; always fall through to GET.
+            if method == "HEAD":
+                continue
             return url, False, f"HTTP {exc.code}", exc.code in (404, 410)
         except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
             if method == "HEAD":
@@ -148,10 +150,10 @@ def prune_files(files: list[Path], dead_urls: set[str]) -> dict[Path, list[str]]
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "file",
-        nargs="?",
-        default="osint/osint.html",
-        help="Bookmark HTML file to scan (default: osint/osint.html)",
+        "files",
+        nargs="*",
+        default=list(DEFAULT_FILES),
+        help=f"Bookmark HTML file(s) to scan (default: {', '.join(DEFAULT_FILES)})",
     )
     parser.add_argument("--timeout", type=float, default=20.0)
     parser.add_argument("--workers", type=int, default=16)
@@ -163,25 +165,33 @@ def main() -> int:
     parser.add_argument(
         "--prune",
         action="store_true",
-        help="Remove hard-dead links (404/410 or permanent DNS failure) from "
-        f"{', '.join(DEFAULT_PRUNE_FILES)}. Transient failures are kept.",
+        help="Remove hard-dead links (404/410 or permanent DNS failure) from each "
+        "scanned file and its sibling README.md. Transient failures are kept.",
     )
     args = parser.parse_args()
 
-    html_path = Path(args.file)
-    if not html_path.is_file():
-        print(f"::error::File not found: {html_path}", file=sys.stderr)
+    html_paths = [Path(f) for f in args.files]
+    missing = [p for p in html_paths if not p.is_file()]
+    if missing:
+        print(f"::error::File(s) not found: {', '.join(map(str, missing))}",
+              file=sys.stderr)
         return 2
 
     if args.diff_base:
-        urls = changed_urls(html_path, args.diff_base)
+        # Diff-wide across all collections; changed_urls ignores the path arg.
+        urls = changed_urls(html_paths[0], args.diff_base)
         if not urls:
             print(f"No new links added vs {args.diff_base} — nothing to check.")
             return 0
         print(f"Checking {len(urls)} newly added link(s) vs {args.diff_base}...\n")
     else:
-        urls = extract_urls(html_path)
-        print(f"Checking {len(urls)} unique links in {html_path}...\n")
+        seen: dict[str, None] = {}
+        for p in html_paths:
+            for u in extract_urls(p):
+                seen.setdefault(u, None)
+        urls = list(seen)
+        print(f"Checking {len(urls)} unique links across "
+              f"{len(html_paths)} file(s)...\n")
 
     dead: list[tuple[str, str]] = []  # hard-dead: 404/410 or permanent DNS
     transient: list[tuple[str, str]] = []  # broken but possibly temporary
@@ -201,10 +211,13 @@ def main() -> int:
     )
 
     if args.prune and dead:
-        removed = prune_files(
-            [html_path, *(Path(f) for f in DEFAULT_PRUNE_FILES if f != args.file)],
-            {url for url, _ in dead},
-        )
+        # Prune each scanned file and the README mirror in its directory.
+        prune_targets: list[Path] = []
+        for p in html_paths:
+            for target in (p, p.parent / "README.md"):
+                if target not in prune_targets:
+                    prune_targets.append(target)
+        removed = prune_files(prune_targets, {url for url, _ in dead})
         print("\n### Removed hard-dead links\n")
         for path, urls_removed in removed.items():
             for url in urls_removed:

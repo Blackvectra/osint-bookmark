@@ -8,6 +8,7 @@ GitHub Actions that maintain them automatically:
 | Folder | What's in it |
 | --- | --- |
 | [`osint/`](osint/) | A curated, categorized directory of OSINT (Open Source Intelligence) tools, importable into any browser. |
+| [`security/`](security/) | A curated directory of security & penetration-testing tools and resources — recon, exploitation, forensics, threat intel, and practice labs. |
 | [`favorites/`](favorites/) | Your personal bookmarks — drop a browser export in, and an Action organizes it for you. |
 
 ## `osint/` — curated OSINT tools
@@ -26,6 +27,17 @@ instructions.
   permanent DNS failure) via a reviewable pull request, while listing
   merely-flaky links (timeouts, 5xx) in a tracking issue rather than deleting
   them.
+
+## `security/` — security & pentesting tools
+
+A categorized, browser-importable directory of ~70 reputable security and
+penetration-testing resources: reconnaissance, web app testing, exploitation
+frameworks, password tooling, Active Directory, forensics, threat
+intelligence, and hands-on practice labs (CTFs). See
+[`security/README.md`](security/README.md).
+
+The same link checker keeps this collection healthy on the same weekly
+schedule and PR checks. _For lawful, authorized testing and education only._
 
 ## `favorites/` — your bookmarks, auto-organized
 

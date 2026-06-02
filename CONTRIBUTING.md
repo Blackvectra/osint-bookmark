@@ -16,25 +16,30 @@ new tools, corrections, and dead-link fixes are all welcome.
 osint/                  Curated OSINT tools directory
   osint.html              Canonical, browser-importable bookmark file (source of truth)
   README.md               Human-readable table of contents mirroring osint.html
+security/               Curated security & pentesting directory
+  security.html           Canonical, browser-importable bookmark file (source of truth)
+  README.md               Table of contents mirroring security.html
 favorites/              Your personal bookmarks
   inbox/                  Drop browser exports here
   favorites.html          Generated, organized bookmark file
 scripts/
-  check_links.py          Link validator / dead-link pruner
+  check_links.py          Link validator / dead-link pruner (scans every collection)
   organize.py             Hybrid bookmark categorizer
 ```
 
-In `osint/`, the bookmark file and the README hold the **same** `<DT><A HREF>`
-entries — `osint.html` is the source of truth and `README.md` mirrors it.
-When you add or change a link, **update both** so they stay in sync.
+In each curated collection (`osint/`, `security/`), the bookmark file and its
+README hold the **same** `<DT><A HREF>` entries — the `.html` is the source of
+truth and `README.md` mirrors it. When you add or change a link, **update
+both** so they stay in sync.
 
-## Adding a link to the OSINT directory
+## Adding a link to a curated directory
 
-1. Find the most appropriate category folder in `osint/osint.html`.
+1. Find the most appropriate category folder in `osint/osint.html` or
+   `security/security.html`.
 2. Add a `<DT><A HREF="...">Tool Name</A>` entry alongside the others.
    - Prefer `https://` URLs.
    - Use a clear, recognizable tool name.
-3. Mirror the addition under the matching section in `osint/README.md`.
+3. Mirror the addition under the matching section in that folder's `README.md`.
 4. Open a pull request describing what the tool does and why it's useful.
 
 ## Link checking

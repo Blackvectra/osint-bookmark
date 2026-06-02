@@ -8,6 +8,7 @@ on:
   pull_request:
     paths:
       - "osint/osint.html"
+      - "security/security.html"
       - "scripts/check_links.py"
       - ".github/workflows/check-links.yml"
   # Allow running on demand from the Actions tab.
@@ -39,7 +40,7 @@ jobs:
           # Off PRs, prune hard-dead links (404/410 / permanent DNS) in place.
           PRUNE_ARG: ${{ github.event_name != 'pull_request' && '--prune' || '' }}
         run: |
-          python scripts/check_links.py osint/osint.html $DIFF_ARG $PRUNE_ARG | tee report.txt
+          python scripts/check_links.py osint/osint.html security/security.html $DIFF_ARG $PRUNE_ARG | tee report.txt
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
       # Did pruning actually remove anything? If so, raise a PR with the removals.
@@ -47,7 +48,7 @@ jobs:
         id: pruned
         if: github.event_name != 'pull_request'
         run: |
-          if [ -n "$(git status --porcelain osint/osint.html osint/README.md)" ]; then
+          if [ -n "$(git status --porcelain osint/ security/)" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -59,7 +60,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -C automated/prune-dead-links
-          git add osint/osint.html osint/README.md
+          git add osint/ security/
           git commit -m "Remove dead links flagged by the link checker"
           git push -f origin automated/prune-dead-links
 
