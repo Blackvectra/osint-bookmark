@@ -9,7 +9,7 @@ penetration-testing resources, kept healthy automatically, plus a tool that
 organizes your *own* bookmark exports the way you want them.
 
 The whole collection is also a **live website** you can search and filter in
-the browser — 271 tools, instant search, no install. It's a single
+the browser — 437 tools, instant search, no install. It's a single
 self-contained page generated from this repo by
 [`scripts/build_site.py`](scripts/build_site.py) and published via GitHub
 Pages. (To enable: repo **Settings → Pages → Source: GitHub Actions** — one
@@ -25,22 +25,28 @@ click; or open [`docs/index.html`](docs/index.html) locally.)
 
 ## `security/` — the pentesting library
 
-A categorized, browser-importable directory of ~70 reputable tools and
-resources across the kill chain:
+A categorized, browser-importable directory of **237 reputable tools** across
+21 categories spanning the offensive *and* defensive workflow:
 
-- **Recon & OSINT** — Nmap, Shodan, Censys, Amass, SpiderFoot, Maltego…
-- **Web app** — Burp Suite, OWASP ZAP, sqlmap, ffuf, Nuclei, WPScan
-- **Exploitation & C2** — Metasploit, Exploit-DB, Impacket, Sliver
-- **Passwords** — Hashcat, John, Hydra, Have I Been Pwned
-- **Active Directory** — BloodHound, NetExec, Mimikatz, Responder, Certipy
-- **Network/wireless**, **vuln intel** (CVE, NVD, CISA KEV, MITRE ATT&CK, OWASP)
-- **Forensics & RE** — Ghidra, Volatility, CyberChef, radare2
-- **Threat intel** — VirusTotal, urlscan, GreyNoise, MISP, OpenCTI
-- **Learning & CTF** — Hack The Box, TryHackMe, PortSwigger Academy, picoCTF…
-- **Cheat sheets** — HackTricks, PayloadsAllTheThings, GTFOBins, SecLists
+- **Recon & OSINT** — Nmap, Shodan, Censys, Amass, subfinder, httpx, Katana…
+- **Web & API** — Burp Suite, Caido, ZAP, sqlmap, ffuf, Nuclei, Dalfox, Kiterunner
+- **Cloud** — Prowler, ScoutSuite, Pacu, CloudFox, ROADtools, stratus-red-team
+- **Containers & K8s** — Trivy, Grype, kube-hunter, kube-bench, Kubescape, Falco
+- **Mobile** — MobSF, Frida, Objection, jadx, Apktool, OWASP MASTG
+- **Exploitation & C2** — Metasploit, Impacket, Sliver, Havoc, Mythic, PoshC2
+- **Active Directory** — BloodHound, NetExec, Rubeus, Certipy, Responder, Kerbrute
+- **Privesc** — PEASS-ng, Seatbelt, pspy, linPEAS/winPEAS, PrivescCheck
+- **Code & supply chain** — Semgrep, CodeQL, Gitleaks, TruffleHog, OSV-Scanner, Checkov
+- **Fuzzing** — AFL++, libFuzzer, honggfuzz, boofuzz, RESTler
+- **Forensics & RE** — Ghidra, IDA, Cutter, x64dbg, capa, YARA, Volatility 3, Velociraptor
+- **Threat & vuln intel** — VirusTotal, GreyNoise, MISP, OpenCTI, abuse.ch, NVD, CISA KEV
+- **Learning, references, reporting & distros** — HTB, PortSwigger Academy, HackTricks,
+  PayloadsAllTheThings, GTFOBins, SecLists, Ghostwriter, Kali, REMnux…
 
 Import [`security/security.html`](security/security.html) into any browser; see
-[`security/README.md`](security/README.md) for the full list.
+[`security/README.md`](security/README.md) for the full list. The catalog is a
+single source of truth in [`scripts/build_security.py`](scripts/build_security.py)
+that generates both the importable file and the README.
 
 **Kept healthy automatically** by [`scripts/check_links.py`](scripts/check_links.py):
 

@@ -16,31 +16,45 @@ new tools, corrections, and dead-link fixes are all welcome.
 osint/                  Curated OSINT tools directory
   osint.html              Canonical, browser-importable bookmark file (source of truth)
   README.md               Human-readable table of contents mirroring osint.html
-security/               Curated security & pentesting directory
-  security.html           Canonical, browser-importable bookmark file (source of truth)
-  README.md               Table of contents mirroring security.html
+security/               Curated security & pentesting directory (generated)
+  security.html           Browser-importable bookmark file (generated)
+  README.md               Table of contents (generated)
+docs/
+  index.html              Live, searchable website (generated)
 favorites/              Your personal bookmarks
   inbox/                  Drop browser exports here
   favorites.html          Generated, organized bookmark file
 scripts/
+  build_security.py       Source of truth for the security catalog -> generates
+                          security.html + security/README.md
+  build_site.py           Generates the live site (docs/index.html)
   check_links.py          Link validator / dead-link pruner (scans every collection)
   organize.py             Hybrid bookmark categorizer
 ```
 
-In each curated collection (`osint/`, `security/`), the bookmark file and its
-README hold the **same** `<DT><A HREF>` entries — the `.html` is the source of
-truth and `README.md` mirrors it. When you add or change a link, **update
-both** so they stay in sync.
+The two curated collections are maintained differently:
 
-## Adding a link to a curated directory
+- **`security/`** is **generated**. The catalog lives in
+  `scripts/build_security.py`; running it writes both `security.html` and
+  `security/README.md`. Don't edit those two files by hand.
+- **`osint/`** is **hand-maintained**. Its `osint.html` is the source of truth
+  and `README.md` mirrors it, so changes go in both.
 
-1. Find the most appropriate category folder in `osint/osint.html` or
-   `security/security.html`.
-2. Add a `<DT><A HREF="...">Tool Name</A>` entry alongside the others.
-   - Prefer `https://` URLs.
-   - Use a clear, recognizable tool name.
-3. Mirror the addition under the matching section in that folder's `README.md`.
+## Adding a tool to the security collection
+
+1. Add a `("Tool Name", "https://…")` line to the right category in
+   `scripts/build_security.py` (prefer `https://`; use a recognizable name).
+2. Run `python scripts/build_security.py` to regenerate the HTML + README, then
+   `python scripts/build_site.py` to refresh the live site.
+3. Validate with `python scripts/check_links.py security/security.html`.
 4. Open a pull request describing what the tool does and why it's useful.
+
+## Adding a tool to the OSINT collection
+
+1. Add a `<DT><A HREF="...">Tool Name</A>` entry to the right category folder in
+   `osint/osint.html`, and mirror it under the matching section in
+   `osint/README.md`.
+2. Open a pull request describing what the tool does and why it's useful.
 
 ## Link checking
 
