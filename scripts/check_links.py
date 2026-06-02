@@ -62,11 +62,17 @@ def changed_urls(html_path: Path, base_ref: str) -> list[str]:
     """URLs introduced on added (+) diff lines relative to base_ref.
 
     Used by PR runs so contributors are gated only on the links they add,
-    not on pre-existing link rot. Falls back to a full scan if git fails.
+    not on pre-existing link rot. The diff is taken across the whole PR with
+    rename detection (path-limiting defeats rename detection — git would
+    report a moved file as entirely new). Added lines are attributed to their
+    file and collected only from `.html` bookmark files, so:
+      - moving the bookmark file shows as a pure rename (no added lines), and
+      - the markdown README mirror (which duplicates every link) is ignored.
+    Falls back to a full scan if git fails.
     """
     try:
         diff = subprocess.run(
-            ["git", "diff", "--unified=0", f"{base_ref}...HEAD", "--", str(html_path)],
+            ["git", "diff", "--unified=0", "--find-renames", f"{base_ref}...HEAD"],
             capture_output=True,
             text=True,
             check=True,
@@ -75,12 +81,14 @@ def changed_urls(html_path: Path, base_ref: str) -> list[str]:
         print(f"::warning::diff vs {base_ref} failed ({exc}); scanning whole file.")
         return extract_urls(html_path)
 
-    added = "\n".join(
-        line[1:]
-        for line in diff.splitlines()
-        if line.startswith("+") and not line.startswith("+++")
-    )
-    return _hrefs(added)
+    added: list[str] = []
+    current = ""
+    for line in diff.splitlines():
+        if line.startswith("+++ "):
+            current = line[6:] if line.startswith("+++ b/") else line[4:]
+        elif line.startswith("+") and current.endswith(".html"):
+            added.append(line[1:])
+    return _hrefs("\n".join(added))
 
 
 def _is_dead_dns(reason: object) -> bool:
