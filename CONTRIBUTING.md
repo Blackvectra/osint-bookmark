@@ -34,8 +34,9 @@ When you add or change a link, **update both files** so they stay in sync.
 
 A GitHub Action (`.github/workflows/check-links.yml`) validates every link:
 
-- on each pull request that touches `osint.html`,
-- weekly on a schedule (opening a tracking issue when links break).
+- on each pull request that touches `osint.html` (only the links the PR
+  *adds* are checked, so you aren't blocked by pre-existing rot),
+- weekly on a schedule, where it also **auto-prunes dead links**.
 
 You can run the checker locally before opening a PR:
 
@@ -45,6 +46,21 @@ python scripts/check_links.py osint.html
 
 It needs only Python 3 (standard library, no extra packages) and exits
 non-zero if any link is unreachable.
+
+### Auto-pruning dead links
+
+On the weekly schedule (and via `workflow_dispatch`), the checker removes
+links with a **definitive** dead signal — HTTP `404`/`410` or a permanent
+DNS failure — from both `osint.html` and `README.md`, then opens a pull
+request with the removals for review. Links that merely time out, return a
+`5xx`, or are rate-limited are **kept**, since those are usually transient;
+they're listed in a `broken-links` tracking issue instead.
+
+To prune locally (edits files in place — commit or discard as you like):
+
+```bash
+python scripts/check_links.py osint.html --prune
+```
 
 ## Guidelines
 
