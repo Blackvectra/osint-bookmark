@@ -1,0 +1,20 @@
+{
+  "_comment": "Copy to organize.config.json and edit. Defines how your favorites are organized. All keys optional; omitted keys use the built-in security/pentest defaults.",
+
+  "sort": "name",
+  "_sort_help": "'name' = alphabetical within each folder; 'recent' = newest first by date added (browser exports carry no visit counts, so true 'most used' isn't available).",
+
+  "frequent": ["portswigger.net", "hackthebox.com", "github.com/your-org"],
+  "_frequent_help": "Substrings (matched against URL or title) that float a link into a top '★ Frequently Used' folder. This is your manual most-used pin list.",
+
+  "categories": {
+    "Recon & OSINT": ["nmap", "shodan", "censys", "amass", "spiderfoot", "maltego"],
+    "Web App Testing": ["burp", "portswigger", "zaproxy", "sqlmap", "ffuf", "nuclei"],
+    "Exploitation & C2": ["metasploit", "exploit-db", "impacket", "sliver"],
+    "Active Directory": ["bloodhound", "netexec", "mimikatz", "responder"],
+    "Threat Intel": ["virustotal", "urlscan", "greynoise", "misp", "abuseipdb"],
+    "Learning & CTF": ["hackthebox", "tryhackme", "web-security", "overthewire"],
+    "Dev & Tooling": ["github.com", "gitlab.com", "stackoverflow"],
+    "Reading": ["medium.com", "substack", "news.ycombinator"]
+  }
+}
