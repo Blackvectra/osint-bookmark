@@ -1,0 +1,42 @@
+name: Organize favorites
+
+on:
+  # Re-organize whenever you drop a new export into favorites/inbox/.
+  push:
+    paths:
+      - "favorites/inbox/**"
+      - "scripts/organize.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write # commit the regenerated favorites back
+
+jobs:
+  organize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Organize bookmarks
+        env:
+          # Optional: set this repo secret to enable Claude categorization of
+          # links the rules don't catch. Without it, the rule-based pass runs
+          # and anything unmatched lands in "Uncategorized".
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python scripts/organize.py
+
+      - name: Commit organized output
+        run: |
+          if [ -z "$(git status --porcelain favorites/favorites.html favorites/README.md)" ]; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add favorites/favorites.html favorites/README.md
+          git commit -m "Re-organize favorites [skip ci]"
+          git push

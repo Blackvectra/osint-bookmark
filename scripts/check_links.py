@@ -33,7 +33,7 @@ HREF_RE = re.compile(r'HREF="([^"]+)"', re.IGNORECASE)
 # A bookmark entry line; only these are eligible for pruning.
 ENTRY_RE = re.compile(r"<DT><A\s", re.IGNORECASE)
 # Files whose embedded bookmark HTML should be kept in sync when pruning.
-DEFAULT_PRUNE_FILES = ("osint.html", "README.md")
+DEFAULT_PRUNE_FILES = ("osint/osint.html", "osint/README.md")
 # Permanent DNS failures (name does not resolve). Substring match keeps this
 # portable across platforms; note "Temporary failure in name resolution"
 # (EAI_AGAIN) is intentionally excluded as it is transient.
@@ -142,8 +142,8 @@ def main() -> int:
     parser.add_argument(
         "file",
         nargs="?",
-        default="osint.html",
-        help="Bookmark HTML file to scan (default: osint.html)",
+        default="osint/osint.html",
+        help="Bookmark HTML file to scan (default: osint/osint.html)",
     )
     parser.add_argument("--timeout", type=float, default=20.0)
     parser.add_argument("--workers", type=int, default=16)
