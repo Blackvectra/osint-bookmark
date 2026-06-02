@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import re
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -26,14 +27,43 @@ USER_AGENT = (
 HREF_RE = re.compile(r'HREF="([^"]+)"', re.IGNORECASE)
 
 
-def extract_urls(html_path: Path) -> list[str]:
-    """Return the ordered, de-duplicated list of http(s) URLs in the file."""
-    text = html_path.read_text(encoding="utf-8", errors="replace")
+def _hrefs(text: str) -> list[str]:
+    """Ordered, de-duplicated http(s) URLs found in a blob of text."""
     seen: dict[str, None] = {}
     for url in HREF_RE.findall(text):
         if url.startswith(("http://", "https://")):
             seen.setdefault(url, None)
     return list(seen)
+
+
+def extract_urls(html_path: Path) -> list[str]:
+    """Return the ordered, de-duplicated list of http(s) URLs in the file."""
+    return _hrefs(html_path.read_text(encoding="utf-8", errors="replace"))
+
+
+def changed_urls(html_path: Path, base_ref: str) -> list[str]:
+    """URLs introduced on added (+) diff lines relative to base_ref.
+
+    Used by PR runs so contributors are gated only on the links they add,
+    not on pre-existing link rot. Falls back to a full scan if git fails.
+    """
+    try:
+        diff = subprocess.run(
+            ["git", "diff", "--unified=0", f"{base_ref}...HEAD", "--", str(html_path)],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        print(f"::warning::diff vs {base_ref} failed ({exc}); scanning whole file.")
+        return extract_urls(html_path)
+
+    added = "\n".join(
+        line[1:]
+        for line in diff.splitlines()
+        if line.startswith("+") and not line.startswith("+++")
+    )
+    return _hrefs(added)
 
 
 def check_url(url: str, timeout: float) -> tuple[str, bool, str]:
@@ -72,6 +102,11 @@ def main() -> int:
     )
     parser.add_argument("--timeout", type=float, default=20.0)
     parser.add_argument("--workers", type=int, default=16)
+    parser.add_argument(
+        "--diff-base",
+        metavar="REF",
+        help="Only check links added relative to this git ref (for PR runs).",
+    )
     args = parser.parse_args()
 
     html_path = Path(args.file)
@@ -79,8 +114,15 @@ def main() -> int:
         print(f"::error::File not found: {html_path}", file=sys.stderr)
         return 2
 
-    urls = extract_urls(html_path)
-    print(f"Checking {len(urls)} unique links in {html_path}...\n")
+    if args.diff_base:
+        urls = changed_urls(html_path, args.diff_base)
+        if not urls:
+            print(f"No new links added vs {args.diff_base} — nothing to check.")
+            return 0
+        print(f"Checking {len(urls)} newly added link(s) vs {args.diff_base}...\n")
+    else:
+        urls = extract_urls(html_path)
+        print(f"Checking {len(urls)} unique links in {html_path}...\n")
 
     broken: list[tuple[str, str]] = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:

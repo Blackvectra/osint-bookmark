@@ -22,6 +22,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history so PR runs can diff against the base branch.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -29,8 +32,11 @@ jobs:
 
       - name: Check links
         id: check
+        env:
+          # On PRs, gate only on newly added links; otherwise scan everything.
+          DIFF_ARG: ${{ github.event_name == 'pull_request' && format('--diff-base origin/{0}', github.base_ref) || '' }}
         run: |
-          python scripts/check_links.py osint.html | tee report.txt
+          python scripts/check_links.py osint.html $DIFF_ARG | tee report.txt
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
       # On scheduled runs, open or refresh a tracking issue when links break.
