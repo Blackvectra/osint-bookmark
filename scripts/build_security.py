@@ -17,6 +17,11 @@ from pathlib import Path
 
 WRAPPER = "Security & Pentesting"
 
+# Public URL where the searchable site is published (e.g. GitHub Pages). Leave
+# empty to omit the "browse the live site" link and point readers to the local
+# docs/index.html instead. Set this once the site has a stable home.
+SITE_URL = ""
+
 # Ordered catalog: category -> [(name, url), ...]. Curated, reputable tools and
 # references across the offensive/defensive workflow. Keep names recognizable
 # and prefer official sites or canonical source repos.
@@ -342,8 +347,10 @@ def render_readme() -> str:
         "exploitation to cloud, mobile, forensics, threat intel, and hands-on "
         "practice.",
         "",
-        "**[🔎 Browse everything on the live, searchable site →]"
-        "(https://blackvectra.github.io/osint-bookmark/)**",
+        (f"**[🔎 Browse everything on the live, searchable site →]({SITE_URL})**"
+         if SITE_URL else
+         "**Prefer a searchable view?** Open [`docs/index.html`](../docs/index.html) "
+         "in your browser, or import `security.html` below."),
         "",
         "Import `security.html` into your browser the same way as the "
         "[OSINT collection](../osint/README.md#method-to-import-bookmark).",
