@@ -2,7 +2,7 @@
 
 A curated, browser-importable directory of 237 security, penetration-testing, and defensive resources — from reconnaissance and exploitation to cloud, mobile, forensics, threat intel, and hands-on practice.
 
-**[🔎 Browse everything on the live, searchable site →](https://blackvectra.github.io/osint-bookmark/)**
+**Prefer a searchable view?** Open [`docs/index.html`](../docs/index.html) in your browser, or import `security.html` below.
 
 Import `security.html` into your browser the same way as the [OSINT collection](../osint/README.md#method-to-import-bookmark).
 
